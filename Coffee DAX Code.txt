@@ -1,0 +1,69 @@
+Total Sales = SUM(Transactions[Sales])
+Total Orders = DISTINCTCOUNT(Transactions[transaction_id])
+Total Quantity Solde = SUM(Transactions[transaction_qty])
+
+CM Sales = VAR selected_month = SELECTEDVALUE('Date Table'[Month])
+        RETURN
+        TOTALMTD(CALCULATE([Total Sales], 'Date Table'[Month] = selected_month), 'Date Table'[Date])
+
+CM Orders = VAR selected_month = SELECTEDVALUE('Date Table'[Month])
+        RETURN
+        TOTALMTD(CALCULATE([Total Orders], 'Date Table'[Month] = selected_month), 'Date Table'[Date])
+
+CM Quantity = 
+ VAR selected_month = SELECTEDVALUE('Date Table'[Month])
+        RETURN
+        TOTALMTD(CALCULATE([Total Quantity Solde], 'Date Table'[Month] = selected_month), 'Date Table'[Date])
+
+PM Sales = CALCULATE([CM Sales], DATEADD('Date Table'[Date], -1, MONTH))
+
+PM Orders = CALCULATE([CM Orders], DATEADD('Date Table'[Date], -1, MONTH))
+
+PM Quantity = CALCULATE([CM Quantity], DATEADD('Date Table'[Date], -1, MONTH))
+
+MoM Growth & Diff Sales = 
+        VAR Month_diff = [CM Sales] - [PM Sales]
+        VAR mom = ([CM Sales] - [PM Sales]) / [PM Sales]
+        VAR _sign = IF(Month_diff>0, "+", "")
+        VAR _sign_trend = IF(Month_diff >0, "▲", "▼")
+        RETURN
+        _sign_trend & " " & _sign & FORMAT(mom, "#0.0%" & " | " & _sign & FORMAT(Month_diff/1000, "0.0K")) & " " & "vs LM"
+
+MoM Growth & Diff Orders = 
+        VAR Month_diff = [CM Orders] - [PM Orders]
+        VAR mom = ([CM Orders] - [PM Orders]) / [PM Orders]
+        VAR _sign = IF(Month_diff>0, "+", "")
+        VAR _sign_trend = IF(Month_diff >0, "▲", "▼")
+        RETURN
+        _sign_trend & " " & _sign & FORMAT(mom, "#0.0%" & " | " & _sign & FORMAT(Month_diff/1000, "0.0K")) & " " & "vs LM"
+
+MoM Growth & Diff Quantity = 
+        VAR Month_diff = [CM Quantity] - [PM Quantity]
+        VAR mom = ([CM Quantity] - [PM Quantity]) / [PM Quantity]
+        VAR _sign = IF(Month_diff>0, "+", "")
+        VAR _sign_trend = IF(Month_diff >0, "▲", "▼")
+        RETURN
+        _sign_trend & " " & _sign & FORMAT(mom, "#0.0%" & " | " & _sign & FORMAT(Month_diff/1000, "0.0K")) & " " & "vs LM"
+
+New MoM Label = 
+        VAR Month_diff = [CM Sales] - [PM Sales]
+        VAR mom = ([CM Sales] - [PM Sales]) / [PM Sales]
+        VAR _sign = IF(Month_diff>0, "+", "")
+        VAR _sign_trend = IF(Month_diff >0, "▲", "▼")
+        RETURN
+        _sign_trend & " " & _sign & FORMAT(mom, "#0.0%")
+
+
+Label fro Product Category = SELECTEDVALUE(Transactions[product_category]) & " | " & FORMAT([total sales]/1000, "$0.00K")
+
+Label fro Product Type = SELECTEDVALUE(Transactions[product_type]) & " | " & FORMAT([total sales]/1000, "$0.00K")
+
+Label fro Store Location = SELECTEDVALUE(Transactions[store_location]) & " | " & FORMAT([total sales]/1000, "$0.00K")
+
+
+
+
+
+
+
+
